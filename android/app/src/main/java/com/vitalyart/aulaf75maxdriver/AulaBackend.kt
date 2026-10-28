@@ -253,7 +253,6 @@ class AndroidAulaBackend(private val context: Context) {
         return UsbHidSession.open(
             context = context,
             vendorId = AulaConstants.wiredVendorID,
-            productId = AulaConstants.wiredProductID,
             productIds = AulaConstants.wiredProductIDs,
             label = "wired keyboard command endpoint",
             requiredUsagePage = AulaConstants.wiredCommandUsagePage
@@ -264,7 +263,6 @@ class AndroidAulaBackend(private val context: Context) {
         return UsbHidSession.open(
             context = context,
             vendorId = AulaConstants.wiredVendorID,
-            productId = AulaConstants.wiredProductID,
             productIds = AulaConstants.wiredProductIDs,
             label = "wired keyboard display endpoint",
             requiredUsagePage = AulaConstants.wiredRawUsagePage
@@ -275,7 +273,7 @@ class AndroidAulaBackend(private val context: Context) {
         return UsbHidSession.open(
             context = context,
             vendorId = AulaConstants.dongleVendorID,
-            productId = AulaConstants.dongleProductID,
+            productIds = listOf(AulaConstants.dongleProductID),
             label = "2.4G receiver raw",
             requiredUsagePage = AulaConstants.wirelessRawUsagePage,
             interfacePredicate = { usbInterface ->

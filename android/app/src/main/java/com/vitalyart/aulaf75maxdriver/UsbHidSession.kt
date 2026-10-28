@@ -25,16 +25,14 @@ class UsbHidSession private constructor(
         fun open(
             context: Context,
             vendorId: Int,
-            productId: Int,
+            productIds: List<Int>,
             label: String,
-            productIds: List<Int> = emptyList(),
             interfacePredicate: (UsbInterface) -> Boolean = { true },
             requiredUsagePage: Int? = null
         ): UsbHidSession {
             val usbManager = context.getSystemService(UsbManager::class.java)
-            val ids = if (productIds.isEmpty()) listOf(productId) else productIds
             val device = usbManager.deviceList.values.firstOrNull {
-                it.vendorId == vendorId && it.productId in ids
+                it.vendorId == vendorId && it.productId in productIds
             } ?: throw AulaError.DeviceNotFound()
 
             if (!usbManager.hasPermission(device)) {

@@ -7,7 +7,6 @@ import java.util.Locale
 
 object AulaConstants {
     const val wiredVendorID = 0x0c45
-    const val wiredProductID = 0x800a
     val wiredProductIDs = listOf(0x800a, 0x80b1)
     const val dongleVendorID = 0x05ac
     const val dongleProductID = 0x024f

@@ -421,11 +421,13 @@ final class AulaDevice {
     private static func matchingHIDDevices() -> [IOHIDDevice] {
         let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
 
-        let matching: [String: Any] = [
-            kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
-            kIOHIDProductIDKey: AulaConstants.wiredProductID
-        ]
-        IOHIDManagerSetDeviceMatching(manager, matching as CFDictionary)
+        let matching: [[String: Any]] = AulaConstants.wiredProductIDs.map { pid in
+            [
+                kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
+                kIOHIDProductIDKey: pid
+            ]
+        }
+        IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
         _ = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
         defer {
             IOHIDManagerClose(manager, IOOptionBits(kIOHIDOptionsTypeNone))

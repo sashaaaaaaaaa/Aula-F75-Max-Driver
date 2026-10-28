@@ -435,7 +435,9 @@ final class WirelessAulaDevice {
     }
 
     private static func matchingWiredDevices() -> [IOHIDDevice] {
-        matchingDevices(vendorID: AulaConstants.wiredVendorID, productID: AulaConstants.wiredProductID)
+        AulaConstants.wiredProductIDs.flatMap { pid in
+            matchingDevices(vendorID: AulaConstants.wiredVendorID, productID: pid)
+        }
     }
 
     private static func matchingDevices(vendorID: Int, productID: Int) -> [IOHIDDevice] {

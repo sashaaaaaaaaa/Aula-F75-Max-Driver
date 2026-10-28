@@ -254,6 +254,7 @@ class AndroidAulaBackend(private val context: Context) {
             context = context,
             vendorId = AulaConstants.wiredVendorID,
             productId = AulaConstants.wiredProductID,
+            productIds = AulaConstants.wiredProductIDs,
             label = "wired keyboard command endpoint",
             requiredUsagePage = AulaConstants.wiredCommandUsagePage
         )
@@ -264,6 +265,7 @@ class AndroidAulaBackend(private val context: Context) {
             context = context,
             vendorId = AulaConstants.wiredVendorID,
             productId = AulaConstants.wiredProductID,
+            productIds = AulaConstants.wiredProductIDs,
             label = "wired keyboard display endpoint",
             requiredUsagePage = AulaConstants.wiredRawUsagePage
         )
@@ -335,7 +337,7 @@ class AndroidAulaBackend(private val context: Context) {
     }
 
     private fun isAulaDevice(device: UsbDevice): Boolean {
-        return (device.vendorId == AulaConstants.wiredVendorID && device.productId == AulaConstants.wiredProductID) ||
+        return AulaConstants.isWiredVendorProduct(device.vendorId, device.productId) ||
             (device.vendorId == AulaConstants.dongleVendorID && device.productId == AulaConstants.dongleProductID)
     }
 

@@ -3,8 +3,13 @@ import Foundation
 public enum AulaConstants {
     public static let wiredVendorID = 0x0c45
     public static let wiredProductID = 0x800a
+    public static let wiredProductIDs: [Int] = [0x800a, 0x80b1]
     public static let dongleVendorID = 0x05ac
     public static let dongleProductID = 0x024f
+
+    public static func isWiredVendorProduct(_ vendorID: Int, _ productID: Int) -> Bool {
+        vendorID == wiredVendorID && wiredProductIDs.contains(productID)
+    }
 
     public static let wiredCommandUsagePage = 0xff13
     public static let wiredRawUsagePage = 0xff68

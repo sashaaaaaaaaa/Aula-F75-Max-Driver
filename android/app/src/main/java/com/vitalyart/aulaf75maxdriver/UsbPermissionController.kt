@@ -47,7 +47,7 @@ class UsbPermissionController(
     }
 
     fun hasWiredPermission(): Boolean = usbManager.deviceList.values.any {
-        it.vendorId == AulaConstants.wiredVendorID && it.productId == AulaConstants.wiredProductID && usbManager.hasPermission(it)
+        AulaConstants.isWiredVendorProduct(it.vendorId, it.productId) && usbManager.hasPermission(it)
     }
 
     fun hasReceiverPermission(): Boolean = usbManager.deviceList.values.any {
@@ -72,7 +72,7 @@ class UsbPermissionController(
     }
 
     private fun isAulaDevice(device: UsbDevice): Boolean {
-        return (device.vendorId == AulaConstants.wiredVendorID && device.productId == AulaConstants.wiredProductID) ||
+        return AulaConstants.isWiredVendorProduct(device.vendorId, device.productId) ||
             (device.vendorId == AulaConstants.dongleVendorID && device.productId == AulaConstants.dongleProductID)
     }
 }

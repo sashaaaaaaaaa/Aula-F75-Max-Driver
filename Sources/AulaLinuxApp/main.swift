@@ -80,7 +80,7 @@ public func aulaLinuxFactoryReset(_ buffer: UnsafeMutablePointer<CChar>?, _ capa
 public func aulaLinuxEndpointCounts(_ wired: UnsafeMutablePointer<Int32>?, _ dongle: UnsafeMutablePointer<Int32>?) {
     let backend = LinuxHIDBackend()
     let endpoints = backend.scanEndpoints()
-    wired?.pointee = Int32(endpoints.filter { $0.vendorID == AulaConstants.wiredVendorID && $0.productID == AulaConstants.wiredProductID }.count)
+    wired?.pointee = Int32(endpoints.filter { AulaConstants.isWiredVendorProduct($0.vendorID, $0.productID) }.count)
     dongle?.pointee = Int32(endpoints.filter { $0.vendorID == AulaConstants.dongleVendorID && $0.productID == AulaConstants.dongleProductID }.count)
 }
 

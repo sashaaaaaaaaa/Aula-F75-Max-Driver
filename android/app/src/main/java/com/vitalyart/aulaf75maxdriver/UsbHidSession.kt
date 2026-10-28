@@ -27,12 +27,14 @@ class UsbHidSession private constructor(
             vendorId: Int,
             productId: Int,
             label: String,
+            productIds: List<Int> = emptyList(),
             interfacePredicate: (UsbInterface) -> Boolean = { true },
             requiredUsagePage: Int? = null
         ): UsbHidSession {
             val usbManager = context.getSystemService(UsbManager::class.java)
+            val ids = if (productIds.isEmpty()) listOf(productId) else productIds
             val device = usbManager.deviceList.values.firstOrNull {
-                it.vendorId == vendorId && it.productId == productId
+                it.vendorId == vendorId && it.productId in ids
             } ?: throw AulaError.DeviceNotFound()
 
             if (!usbManager.hasPermission(device)) {
@@ -51,7 +53,7 @@ class UsbHidSession private constructor(
                         val candidate = device.getInterface(index)
                         if (candidate.interfaceClass != UsbConstants.USB_CLASS_HID) continue
                         val info = readReportInfo(connection, candidate,
-                            allowInputOnlyVendor = vendorId == AulaConstants.wiredVendorID && productId == AulaConstants.wiredProductID)
+                            allowInputOnlyVendor = AulaConstants.isWiredVendorProduct(vendorId, device.productId))
                         val description = "${candidate.id}:${info.usagePages.map { "0x%04x".format(it) }}"
                         observed.add(description)
                         android.util.Log.d("AulaUSB", "Interface $description input=${info.inputBytes} output=${info.outputBytes} feature=${info.featureBytes}")
@@ -109,7 +111,7 @@ class UsbHidSession private constructor(
                 (0 until device.interfaceCount).map { device.getInterface(it) }
                     .filter { it.interfaceClass == UsbConstants.USB_CLASS_HID }
                     .associate { it.id to readReportInfo(connection, it,
-                        allowInputOnlyVendor = device.vendorId == AulaConstants.wiredVendorID && device.productId == AulaConstants.wiredProductID) }
+                        allowInputOnlyVendor = AulaConstants.isWiredVendorProduct(device.vendorId, device.productId)) }
             } finally {
                 connection.close()
             }

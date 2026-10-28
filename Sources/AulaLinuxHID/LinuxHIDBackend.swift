@@ -13,16 +13,16 @@ public final class LinuxHIDBackend {
     }
 
     public func scanEndpoints() -> [HIDEndpointInfo] {
-        scan(vendorID: AulaConstants.wiredVendorID, productID: AulaConstants.wiredProductID) +
-            scan(vendorID: AulaConstants.dongleVendorID, productID: AulaConstants.dongleProductID)
+        scan(vendorID: AulaConstants.wiredVendorID, productIDs: AulaConstants.wiredProductIDs) +
+            scan(vendorID: AulaConstants.dongleVendorID, productIDs: [AulaConstants.dongleProductID])
     }
 
     public func scanWiredEndpoints() -> [HIDEndpointInfo] {
-        scan(vendorID: AulaConstants.wiredVendorID, productID: AulaConstants.wiredProductID)
+        scan(vendorID: AulaConstants.wiredVendorID, productIDs: AulaConstants.wiredProductIDs)
     }
 
     public func scanDongleEndpoints() -> [HIDEndpointInfo] {
-        scan(vendorID: AulaConstants.dongleVendorID, productID: AulaConstants.dongleProductID)
+        scan(vendorID: AulaConstants.dongleVendorID, productIDs: [AulaConstants.dongleProductID])
     }
 
     public func syncTime(date: Date = Date()) throws {
@@ -215,34 +215,36 @@ public final class LinuxHIDBackend {
         )
     }
 
-    private func scan(vendorID: Int, productID: Int) -> [HIDEndpointInfo] {
-        guard let root = hid_enumerate(UInt16(vendorID), UInt16(productID)) else {
-            return []
-        }
-        defer { hid_free_enumeration(root) }
-
+    private func scan(vendorID: Int, productIDs: [Int]) -> [HIDEndpointInfo] {
         var endpoints: [HIDEndpointInfo] = []
-        var current: UnsafeMutablePointer<hid_device_info>? = root
-        while let info = current {
-            let item = info.pointee
-            let path = item.path.map { String(cString: $0) } ?? "\(vendorID):\(productID):\(endpoints.count)"
-            let usagePage = Int(item.usage_page)
-            let usage = Int(item.usage)
-            endpoints.append(
-                HIDEndpointInfo(
-                    id: path,
-                    vendorID: Int(item.vendor_id),
-                    productID: Int(item.product_id),
-                    usagePage: usagePage,
-                    usage: usage,
-                    maxInputReportSize: 512,
-                    maxOutputReportSize: 64,
-                    maxFeatureReportSize: 64,
-                    product: productName(vendorID: Int(item.vendor_id), productID: Int(item.product_id)),
-                    transport: "hidraw"
+        for productID in productIDs {
+            guard let root = hid_enumerate(UInt16(vendorID), UInt16(productID)) else {
+                continue
+            }
+            defer { hid_free_enumeration(root) }
+
+            var current: UnsafeMutablePointer<hid_device_info>? = root
+            while let info = current {
+                let item = info.pointee
+                let path = item.path.map { String(cString: $0) } ?? "\(vendorID):\(productID):\(endpoints.count)"
+                let usagePage = Int(item.usage_page)
+                let usage = Int(item.usage)
+                endpoints.append(
+                    HIDEndpointInfo(
+                        id: path,
+                        vendorID: Int(item.vendor_id),
+                        productID: Int(item.product_id),
+                        usagePage: usagePage,
+                        usage: usage,
+                        maxInputReportSize: 512,
+                        maxOutputReportSize: 64,
+                        maxFeatureReportSize: 64,
+                        product: productName(vendorID: Int(item.vendor_id), productID: Int(item.product_id)),
+                        transport: "hidraw"
+                    )
                 )
-            )
-            current = item.next
+                current = item.next
+            }
         }
 
         return endpoints.sorted {

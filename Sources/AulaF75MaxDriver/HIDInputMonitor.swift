@@ -53,16 +53,18 @@ final class HIDInputMonitor {
 
     private static func matchingDevices() -> [IOHIDDevice] {
         let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        let matching: [[String: Any]] = [
-            [
-                kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
-                kIOHIDProductIDKey: AulaConstants.wiredProductID
-            ],
-            [
-                kIOHIDVendorIDKey: AulaConstants.dongleVendorID,
-                kIOHIDProductIDKey: AulaConstants.dongleProductID
+        let matching: [[String: Any]] =
+            AulaConstants.wiredProductIDs.map { pid in
+                [
+                    kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
+                    kIOHIDProductIDKey: pid
+                ]
+            } + [
+                [
+                    kIOHIDVendorIDKey: AulaConstants.dongleVendorID,
+                    kIOHIDProductIDKey: AulaConstants.dongleProductID
+                ]
             ]
-        ]
         IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
         _ = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
         defer {

@@ -11,16 +11,18 @@ final class HIDDeviceMonitor {
 
     init() {
         manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        let matching: [[String: Any]] = [
-            [
-                kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
-                kIOHIDProductIDKey: AulaConstants.wiredProductID
-            ],
-            [
-                kIOHIDVendorIDKey: AulaConstants.dongleVendorID,
-                kIOHIDProductIDKey: AulaConstants.dongleProductID
+        let matching: [[String: Any]] =
+            AulaConstants.wiredProductIDs.map { pid in
+                [
+                    kIOHIDVendorIDKey: AulaConstants.wiredVendorID,
+                    kIOHIDProductIDKey: pid
+                ]
+            } + [
+                [
+                    kIOHIDVendorIDKey: AulaConstants.dongleVendorID,
+                    kIOHIDProductIDKey: AulaConstants.dongleProductID
+                ]
             ]
-        ]
         IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
 
         let context = Unmanaged.passUnretained(self).toOpaque()

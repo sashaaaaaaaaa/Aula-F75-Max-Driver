@@ -145,15 +145,15 @@ public final class LinuxHIDBackend {
         let device = try openDongleRaw()
         defer { hid_close(device) }
 
-        let lengths = [64, 33, 32]
+        let lengths = [32, 64]
         for length in lengths {
             try sendOutputReport(device, AulaWirelessReports.batteryQuery(includeReportID: false, length: length), operation: "battery query")
-            if let percent = readBatteryPercent(device, timeoutMilliseconds: 250) {
+            if let percent = readBatteryPercent(device, timeoutMilliseconds: 500) {
                 return percent
             }
 
-            try sendOutputReport(device, AulaWirelessReports.batteryQuery(includeReportID: true, length: length), operation: "battery query")
-            if let percent = readBatteryPercent(device, timeoutMilliseconds: 250) {
+            try sendOutputReport(device, AulaWirelessReports.batteryQuery(includeReportID: true, length: length + 1), operation: "battery query")
+            if let percent = readBatteryPercent(device, timeoutMilliseconds: 500) {
                 return percent
             }
         }

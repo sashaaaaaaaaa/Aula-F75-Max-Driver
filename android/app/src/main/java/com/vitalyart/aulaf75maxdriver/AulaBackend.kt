@@ -182,13 +182,13 @@ class AndroidAulaBackend(private val context: Context) {
     @Synchronized
     fun queryBattery(): Int? {
         openDongleSession().use { session ->
-            val lengths = listOf(64, 33, 32)
+            val lengths = listOf(32, 64)
             for (length in lengths) {
                 sendOutputReport(session, AulaWirelessReports.batteryQuery(includeReportID = false, length = length), "battery query")
-                readBatteryPercent(session.readInputReport(512, 250))?.let { return it }
+                readBatteryPercent(session.readInputReport(512, 500))?.let { return it }
 
-                sendOutputReport(session, AulaWirelessReports.batteryQuery(includeReportID = true, length = length), "battery query")
-                readBatteryPercent(session.readInputReport(512, 250))?.let { return it }
+                sendOutputReport(session, AulaWirelessReports.batteryQuery(includeReportID = true, length = length + 1), "battery query")
+                readBatteryPercent(session.readInputReport(512, 500))?.let { return it }
             }
             return null
         }

@@ -149,18 +149,16 @@ final class WirelessAulaDevice {
         batteryPipe = pipe
         pipe.start()
 
-        let lengths = [
-            min(max(outputReportSize, 32), 64),
-            outputReportSize >= 33 ? 33 : outputReportSize
-        ].filter { $0 > 0 }
+        let baseLength = min(max(outputReportSize, 32), 64)
+        let lengths = baseLength == 32 ? [32] : [32, baseLength]
 
         for length in lengths {
             try sendBatteryQuery(includeReportID: false, length: length)
-            if let percent = pipe.waitForPercent(timeout: 0.25) {
+            if let percent = pipe.waitForPercent(timeout: 0.5) {
                 return percent
             }
-            try sendBatteryQuery(includeReportID: true, length: length)
-            if let percent = pipe.waitForPercent(timeout: 0.25) {
+            try sendBatteryQuery(includeReportID: true, length: length + 1)
+            if let percent = pipe.waitForPercent(timeout: 0.5) {
                 return percent
             }
         }

@@ -374,16 +374,16 @@ public final class LinuxHIDBackend {
     }
 
     private func sendFeatureReport(_ device: OpaquePointer, _ bytes: [UInt8], operation: String) throws {
-        let direct = writeFeature(device, bytes)
-        if direct >= 0 {
-            return
-        }
-
         var prefixed = [UInt8](repeating: 0, count: bytes.count + 1)
         prefixed.replaceSubrange(1..<prefixed.count, with: bytes)
         let prefixedResult = writeFeature(device, prefixed)
-        guard prefixedResult >= 0 else {
-            throw AulaError.hidFailed(operation, Int32(prefixedResult))
+        if prefixedResult >= 0 {
+            return
+        }
+
+        let direct = writeFeature(device, bytes)
+        guard direct >= 0 else {
+            throw AulaError.hidFailed(operation, Int32(direct))
         }
     }
 
